@@ -8,3 +8,5 @@ pip install django
 pip install djangorestframework
 
 django-admin startproject config .
+
+npm create vite@latest client -- --template react
