@@ -4,6 +4,8 @@ function App() {
     <>
       <main>
         <h1>Good start!</h1>
+        <h2>Finally</h2>
+        <p>It works!</p>
       </main>
     </>
   )
