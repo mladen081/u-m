@@ -9,4 +9,6 @@ pip install djangorestframework
 
 django-admin startproject config .
 
-npm create vite@latest client -- --template react
+npm create vite@latest client -- --template react\
+
+npm install react-router-dom
