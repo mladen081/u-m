@@ -22,10 +22,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'core',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'core.middleware.RequestIDMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -93,4 +95,89 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+}
+
+if DEBUG:
+    LOGS_DIR = BASE_DIR / 'logs'
+    if not LOGS_DIR.exists():
+        LOGS_DIR.mkdir()
+    LOG_FILE_PATH = LOGS_DIR / 'django.log'
+    USE_FILE_LOGGING = True
+else:
+    LOG_FILE_PATH = '/var/log/django/app.log'
+    
+    import pathlib
+    log_dir = pathlib.Path(LOG_FILE_PATH).parent
+    USE_FILE_LOGGING = False
+    
+    try:
+        log_dir.mkdir(parents=True, exist_ok=True)
+        test_file = log_dir / '.write_test'
+        test_file.touch()
+        test_file.unlink()
+        USE_FILE_LOGGING = True
+    except (PermissionError, OSError) as e:
+        print(f"WARNING: Cannot write to {log_dir}, file logging disabled: {e}")
+        LOGS_DIR = BASE_DIR / 'logs'
+        LOGS_DIR.mkdir(exist_ok=True)
+        LOG_FILE_PATH = LOGS_DIR / 'django.log'
+        USE_FILE_LOGGING = True
+
+handlers_config = {
+    'console': {
+        'class': 'logging.StreamHandler',
+        'formatter': 'verbose' if DEBUG else 'simple',
+    },
+}
+
+if USE_FILE_LOGGING:
+    handlers_config['file'] = {
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': LOG_FILE_PATH,
+        'maxBytes': 1024 * 1024 * 1,
+        'backupCount': 4,
+        'formatter': 'verbose',
+    }
+
+if DEBUG:
+    active_handlers = ['console']
+else:
+    active_handlers = ['console', 'file'] if USE_FILE_LOGGING else ['console']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} | {name} | {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+    },
+    'handlers': handlers_config,
+    'root': {
+        'handlers': active_handlers,
+        'level': 'DEBUG' if DEBUG else 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': active_handlers,
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'core.middleware': {
+            'handlers': active_handlers,
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'core.exceptions': {
+            'handlers': active_handlers,
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
 }
