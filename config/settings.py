@@ -187,6 +187,11 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',  # AxesStandaloneBackend
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Django Axes - Admin Login Protection
 AXES_ENABLED = True
 AXES_FAILURE_LIMIT = 3
