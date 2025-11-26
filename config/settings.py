@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'core',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -181,3 +182,5 @@ LOGGING = {
         },
     },
 }
+
+AUTH_USER_MODEL = 'accounts.CustomUser'

@@ -12,3 +12,8 @@ django-admin startproject config .
 npm create vite@latest client -- --template react\
 
 npm install react-router-dom
+
+python manage.py makemigrations
+python manage.py showmigrations
+python manage.py migrate
+python manage.py createsuperuser
