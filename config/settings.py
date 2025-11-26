@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'axes',
     'core',
     'accounts',
 ]
@@ -36,6 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -184,3 +186,10 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Django Axes - Admin Login Protection
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 3
+AXES_COOLOFF_TIME = 24  # 24 sata
+AXES_LOCK_OUT_AT_FAILURE = True
+AXES_ONLY_ADMIN_SITE = True

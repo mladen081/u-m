@@ -5,6 +5,6 @@ from django.urls import path
 from front.views import index
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("dobrojutromladene/", admin.site.urls),
     path("", index),
 ]
