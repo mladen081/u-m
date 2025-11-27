@@ -1,12 +1,23 @@
+/* src/index.css */
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700;800&display=swap');
 
+/* ============= CSS Variables ============= */
 :root {
   --primary-color: #fff;
   --text-color: #8b949e;
   --text-color-1: #79c0ff;
   --back-color: #0d1117;
+  --error-color: #f85149;
+  --success-color: #3fb950;
+  --input-bg: #161b22;
+  --input-border: #30363d;
+  --input-focus: #58a6ff;
+  --button-bg: #238636;
+  --button-hover: #2ea043;
 }
 
+/* ============= Base Styles ============= */
 *,
 *::after,
 *::before {
@@ -27,7 +38,7 @@ body {
   font-size: clamp(1.4rem, 2.5vw, 1.6rem);
 }
 
-/* Sticky footer setup */
+/* ============= Layout ============= */
 #root {
   display: flex;
   flex-direction: column;
@@ -49,6 +60,7 @@ main {
   width: 100%;
 }
 
+/* ============= Typography ============= */
 h1 {
   font-size: clamp(2.4rem, 5vw, 5rem);
   font-weight: 900;
@@ -99,7 +111,7 @@ li {
   margin: 0.5rem 0;
 }
 
-/* Footer styles */
+/* ============= Footer ============= */
 .footer {
   background-color: var(--back-color);
   padding: 2rem;
@@ -112,4 +124,206 @@ li {
   margin: 0;
   font-size: clamp(1.4rem, 2.5vw, 1.6rem);
   color: var(--text-color);
+}
+
+/* ============= Auth Container (Login/Register) ============= */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem;
+}
+
+.auth-box {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 3rem;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.auth-box h1 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* ============= Forms ============= */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.form-group label {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.form-group input {
+  padding: 1.2rem;
+  font-size: 1.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  color: var(--primary-color);
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--input-focus);
+}
+
+.form-group input::placeholder {
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+/* ============= Buttons ============= */
+.btn-primary {
+  padding: 1.2rem 2rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  background-color: var(--button-bg);
+  color: var(--primary-color);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--button-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============= Error/Success Messages ============= */
+.error-message {
+  padding: 1.2rem;
+  background-color: rgba(248, 81, 73, 0.1);
+  border: 1px solid var(--error-color);
+  border-radius: 6px;
+  color: var(--error-color);
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  white-space: pre-line;
+}
+
+.success-message {
+  padding: 1.2rem;
+  background-color: rgba(63, 185, 80, 0.1);
+  border: 1px solid var(--success-color);
+  border-radius: 6px;
+  color: var(--success-color);
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ============= Auth Link ============= */
+.auth-link {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1.4rem;
+  color: var(--text-color);
+}
+
+.auth-link a {
+  color: var(--text-color-1);
+  font-weight: 700;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+/* ============= Loading ============= */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.loading-container p {
+  font-size: 2rem;
+  color: var(--text-color-1);
+}
+
+/* ============= User Info in Navbar ============= */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.2rem;
+  background-color: rgba(139, 148, 158, 0.1);
+  border-radius: 6px;
+}
+
+.username {
+  font-weight: 700;
+  color: var(--text-color-1);
+}
+
+.badge-admin {
+  padding: 0.3rem 0.8rem;
+  background-color: var(--button-bg);
+  color: var(--primary-color);
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* ============= Logout Button in Navbar ============= */
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--error-color);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: opacity 0.2s ease;
+}
+
+.logout-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* ============= Responsive Design ============= */
+@media (max-width: 768px) {
+  .auth-box {
+    padding: 2rem;
+  }
+
+  .auth-form {
+    gap: 1.5rem;
+  }
+
+  .form-group input {
+    padding: 1rem;
+  }
+
+  .btn-primary {
+    padding: 1rem 1.5rem;
+    font-size: 1.4rem;
+  }
 }
