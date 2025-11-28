@@ -7,14 +7,15 @@
   --primary-color: #fff;
   --text-color: #8b949e;
   --text-color-1: #79c0ff;
+  --accent-color: #58a6ff;
   --back-color: #0d1117;
-  --error-color: #f85149;
-  --success-color: #3fb950;
+  --error-color: #6e7681;
+  --success-color: #58a6ff;
   --input-bg: #161b22;
   --input-border: #30363d;
   --input-focus: #58a6ff;
-  --button-bg: #238636;
-  --button-hover: #2ea043;
+  --button-bg: #1f6feb;
+  --button-hover: #388bfd;
 }
 
 /* ============= Base Styles ============= */
@@ -217,10 +218,10 @@ li {
 /* ============= Error/Success Messages ============= */
 .error-message {
   padding: 1.2rem;
-  background-color: rgba(248, 81, 73, 0.1);
+  background-color: rgba(139, 148, 158, 0.15);
   border: 1px solid var(--error-color);
   border-radius: 6px;
-  color: var(--error-color);
+  color: var(--text-color);
   font-size: 1.4rem;
   margin-bottom: 1.5rem;
   white-space: pre-line;
@@ -228,7 +229,7 @@ li {
 
 .success-message {
   padding: 1.2rem;
-  background-color: rgba(63, 185, 80, 0.1);
+  background-color: rgba(88, 166, 255, 0.15);
   border: 1px solid var(--success-color);
   border-radius: 6px;
   color: var(--success-color);
@@ -294,17 +295,17 @@ li {
 .logout-btn {
   background: none;
   border: none;
-  color: var(--error-color);
+  color: var(--text-color);
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.4rem;
   font-weight: 700;
   cursor: pointer;
   padding: 0.5rem 0;
-  transition: opacity 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .logout-btn:hover {
-  opacity: 0.8;
+  color: var(--text-color-1);
   text-decoration: underline;
 }
 
