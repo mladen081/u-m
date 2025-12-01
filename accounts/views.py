@@ -1,21 +1,30 @@
 # accounts/views.py
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView, 
-    TokenRefreshView
-)
-from rest_framework_simplejwt.serializers import (
-    TokenObtainPairSerializer,
-)
+import logging
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.db import transaction
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from rest_framework import status
-from django.contrib.auth import get_user_model
-from django.db import transaction
-from core.responses import success_response, error_response, validation_error_response, conflict_response
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from core.encryption import TokenEncryption
-import logging
+from core.responses import (
+    conflict_response,
+    error_response,
+    success_response,
+    validation_error_response,
+)
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -373,3 +382,155 @@ class RegisterView(APIView):
         else:
             ip = request.META.get('REMOTE_ADDR', 'unknown')
         return ip
+
+
+class PasswordResetRequestThrottle(AnonRateThrottle):
+    rate = '3/hour'
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_request(request):
+    request_id = getattr(request, 'id', None)
+    email = request.data.get('email', '').strip().lower()
+    
+    logger.info(f"Password reset requested | email={email} | request_id={request_id}")
+    
+    if not email:
+        return validation_error_response(
+            message="Email is required",
+            errors={"email": ["This field is required"]},
+            request_id=request_id
+        )
+    
+    try:
+        user = User.objects.get(email__iexact=email)
+        
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        reset_link = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
+        
+        subject = "Password Reset Request"
+        message = f"""
+Hello {user.username},
+
+You requested to reset your password. Click the link below to reset it:
+
+{reset_link}
+
+This link will expire in 1 hour.
+
+If you didn't request this, please ignore this email.
+
+Best regards,
+Your Team
+        """
+        
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        
+        logger.info(f"Password reset email sent | user_id={user.id} | email={email} | request_id={request_id}")
+        
+        return success_response(
+            message="Password reset email sent. Please check your inbox.",
+            request_id=request_id
+        )
+        
+    except User.DoesNotExist:
+        logger.warning(f"Password reset for non-existent email | email={email} | request_id={request_id}")
+        
+        return success_response(
+            message="If that email exists, a reset link has been sent.",
+            request_id=request_id
+        )
+    
+    except Exception as e:
+        logger.error(f"Password reset email failed | email={email} | error={str(e)} | request_id={request_id}")
+        
+        return error_response(
+            message="Failed to send password reset email",
+            errors={"detail": "Please try again later"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            code="EMAIL_SEND_FAILED",
+            request_id=request_id
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_confirm(request):
+    request_id = getattr(request, 'id', None)
+    
+    uid = request.data.get('uid')
+    token = request.data.get('token')
+    new_password = request.data.get('password')
+    
+    logger.info(f"Password reset confirm attempt | uid={uid} | request_id={request_id}")
+    
+    errors = {}
+    
+    if not uid:
+        errors['uid'] = ['This field is required']
+    if not token:
+        errors['token'] = ['This field is required']
+    if not new_password:
+        errors['password'] = ['This field is required']
+    elif len(new_password) < 8:
+        errors['password'] = ['Password must be at least 8 characters']
+    
+    if errors:
+        return validation_error_response(
+            message="Validation failed",
+            errors=errors,
+            request_id=request_id
+        )
+    
+    try:
+        user_id = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=user_id)
+        
+        if not default_token_generator.check_token(user, token):
+            logger.warning(f"Invalid/expired token | user_id={user_id} | request_id={request_id}")
+            return error_response(
+                message="Invalid or expired reset link",
+                errors={"token": ["This reset link is invalid or has expired"]},
+                status=status.HTTP_400_BAD_REQUEST,
+                code="INVALID_TOKEN",
+                request_id=request_id
+            )
+        
+        user.set_password(new_password)
+        user.save()
+        
+        logger.info(f"Password reset successful | user_id={user.id} | username={user.username} | request_id={request_id}")
+        
+        return success_response(
+            message="Password has been reset successfully. You can now login with your new password.",
+            request_id=request_id
+        )
+        
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        logger.warning(f"Invalid UID in password reset | uid={uid} | request_id={request_id}")
+        return error_response(
+            message="Invalid reset link",
+            errors={"uid": ["Invalid user identification"]},
+            status=status.HTTP_400_BAD_REQUEST,
+            code="INVALID_UID",
+            request_id=request_id
+        )
+    
+    except Exception as e:
+        logger.error(f"Password reset failed | error={str(e)} | request_id={request_id}")
+        return error_response(
+            message="Password reset failed",
+            errors={"detail": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+            code="RESET_FAILED",
+            request_id=request_id
+        )
