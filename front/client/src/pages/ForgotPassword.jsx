@@ -37,7 +37,7 @@ function ForgotPassword() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email" className="sr-only">Email Address</label>
             <input
               type="email"
               id="email"

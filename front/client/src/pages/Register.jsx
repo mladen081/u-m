@@ -50,7 +50,7 @@ function Register() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username" className="sr-only">Username</label>
             <input
               type="text"
               id="username"
@@ -65,7 +65,7 @@ function Register() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email" className="sr-only">Email</label>
             <input
               type="email"
               id="email"
@@ -78,7 +78,7 @@ function Register() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password" className="sr-only">Password</label>
             <input
               type="password"
               id="password"
@@ -92,7 +92,7 @@ function Register() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"

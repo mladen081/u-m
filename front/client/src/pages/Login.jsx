@@ -37,7 +37,7 @@ function Login() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username" className="sr-only">Username</label>
             <input
               type="text"
               id="username"
@@ -50,7 +50,7 @@ function Login() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password" className="sr-only">Password</label>
             <input
               type="password"
               id="password"
