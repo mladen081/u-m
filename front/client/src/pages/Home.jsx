@@ -1,8 +1,8 @@
 function Home() {
   return (
     <main>
-      <h1>The pattern concept</h1>
-      <p>Hello from Rakovica :)</p>
+      <h1>Homepage</h1>
+      <p>Hello</p>
     </main>
   );
 }
