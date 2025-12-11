@@ -1,5 +1,4 @@
 # accounts/views.py
-
 import logging
 
 from django.conf import settings
@@ -46,13 +45,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
     def get_token(cls, user):
-        """Override to add custom claims"""
         token = super().get_token(user)
-        
         token['username'] = user.username
         token['role'] = user.role
         token['is_admin'] = user.is_admin
-        
         return token
 
 
@@ -62,8 +58,6 @@ class SecureLoginView(TokenObtainPairView):
     throttle_classes = [LoginThrottle]
     
     def post(self, request, *args, **kwargs):
-        """Handle login request with encryption and logging"""
-        
         username = request.data.get('username', 'unknown')
         ip = self.get_client_ip(request)
         request_id = getattr(request, 'id', None)
@@ -156,8 +150,6 @@ class SecureTokenRefreshView(TokenRefreshView):
     throttle_classes = [RefreshThrottle]
     
     def post(self, request, *args, **kwargs):
-        """Handle token refresh with decryption and encryption"""
-        
         request_id = getattr(request, 'id', None)
         
         logger.info(f"Token refresh attempt | request_id={request_id}")
@@ -187,11 +179,13 @@ class SecureTokenRefreshView(TokenRefreshView):
                     request_id=request_id
                 )
             
-            request.data._mutable = True
-            request.data['refresh'] = decrypted_refresh
-            request.data._mutable = False
+            from rest_framework.request import Request
+            from io import BytesIO
             
-            response = super().post(request, *args, **kwargs)
+            new_request = Request(request._request)
+            new_request._full_data = {'refresh': decrypted_refresh}
+            
+            response = TokenRefreshView.post(self, new_request, *args, **kwargs)
             
             new_access = TokenEncryption.encrypt(response.data['access'])
             
@@ -251,8 +245,6 @@ class RegisterView(APIView):
     throttle_classes = [RegisterThrottle]
     
     def post(self, request, *args, **kwargs):
-        """Handle user registration"""
-        
         request_id = getattr(request, 'id', None)
         ip = self.get_client_ip(request)
         
@@ -375,7 +367,6 @@ class RegisterView(APIView):
     
     @staticmethod
     def get_client_ip(request):
-        """Extract real client IP address"""
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0].strip()

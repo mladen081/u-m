@@ -46,6 +46,9 @@ function Navbar() {
               <li>
                 <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
               </li>
+              <li>
+                <Link to="/chat" onClick={() => setIsOpen(false)}>Chat</Link>
+              </li>
               {user?.is_admin && (
                 <li>
                   <Link to="/specials" onClick={() => setIsOpen(false)}>Specials</Link>

@@ -2,6 +2,7 @@
 
 import uuid
 import logging
+from core.encryption import TokenEncryption
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,6 @@ class RequestIDMiddleware:
     
     def __call__(self, request):
         request_id = request.headers.get('X-Request-ID', str(uuid.uuid4()))
-        
         request.id = request_id
         
         logger.info(
@@ -21,7 +21,6 @@ class RequestIDMiddleware:
         )
         
         response = self.get_response(request)
-
         response['X-Request-ID'] = request_id
         
         logger.info(
@@ -38,3 +37,24 @@ class RequestIDMiddleware:
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+
+class DecryptTokenMiddleware:
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+    
+    def __call__(self, request):
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        
+        if auth_header.startswith('Bearer '):
+            token = auth_header[7:]
+            
+            if TokenEncryption.is_encrypted(token):
+                try:
+                    decrypted = TokenEncryption.decrypt(token)
+                    request.META['HTTP_AUTHORIZATION'] = f'Bearer {decrypted}'
+                except:
+                    pass
+        
+        return self.get_response(request)
