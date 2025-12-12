@@ -16,7 +16,11 @@ function Chat() {
     setMessages(prev => [...prev, data]);
   };
 
-  const { isConnected, sendMessage } = useWebSocket(handleNewMessage);
+  const handleClearAll = () => {
+    setMessages([]);
+  };
+
+  const { isConnected, sendMessage } = useWebSocket(handleNewMessage, handleClearAll);
 
   useEffect(() => {
     const loadMessages = async () => {

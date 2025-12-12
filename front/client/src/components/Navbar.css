@@ -1,3 +1,5 @@
+/* src/components/Navbar.css */
+
 .navbar {
   width: 100%;
   padding: 2rem;
@@ -90,4 +92,42 @@
 .overlay.active {
   opacity: 1;
   pointer-events: auto;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.logout-btn:hover {
+  color: var(--text-color-1);
+  text-decoration: underline;
+}
+
+.clear-chat-btn {
+  background: none;
+  border: none;
+  color: var(--error-color);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.clear-chat-btn:hover {
+  color: #ff6b6b;
+  text-decoration: underline;
 }

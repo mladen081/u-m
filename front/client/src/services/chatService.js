@@ -11,6 +11,15 @@ const chatService = {
       throw new Error(error.response?.data?.message || 'Failed to fetch messages');
     }
   },
+
+  async deleteAllMessages() {
+    try {
+      const response = await api.delete('/chat/messages/delete-all/');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to delete messages');
+    }
+  },
 };
 
 export default chatService;

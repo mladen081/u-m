@@ -1,7 +1,9 @@
+// src/hooks/useWebSocket.js
+
 import { useEffect, useRef, useState, useCallback } from 'react';
 import TokenManager from '../utils/tokenManager';
 
-const useWebSocket = (onMessage) => {
+const useWebSocket = (onMessage, onClearAll) => {
   const ws = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimeout = useRef(null);
@@ -31,7 +33,12 @@ const useWebSocket = (onMessage) => {
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      onMessage(data);
+      
+      if (data.action === 'clear_all') {
+        onClearAll();
+      } else if (data.action === 'new_message') {
+        onMessage(data);
+      }
     };
 
     ws.current.onclose = () => {
@@ -49,7 +56,7 @@ const useWebSocket = (onMessage) => {
     ws.current.onerror = () => {
       ws.current?.close();
     };
-  }, [onMessage]);
+  }, [onMessage, onClearAll]);
 
   const disconnect = useCallback(() => {
     shouldReconnect.current = false;

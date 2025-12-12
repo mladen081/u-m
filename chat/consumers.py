@@ -59,11 +59,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
+            'action': 'new_message',
             'message': event['message'],
             'username': event['username'],
             'user_id': event['user_id'],
             'timestamp': event['timestamp'],
             'message_id': event['message_id'],
+        }))
+    
+    async def clear_all_messages(self, event):
+        await self.send(text_data=json.dumps({
+            'action': 'clear_all',
         }))
     
     @database_sync_to_async

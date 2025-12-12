@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import chatService from '../services/chatService';
 import './Navbar.css';
 
 function Navbar() {
@@ -20,6 +21,19 @@ function Navbar() {
   const handleLogout = () => {
     setIsOpen(false);
     logout();
+  };
+
+  const handleClearChat = async () => {
+    if (!window.confirm('Delete all chat messages? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await chatService.deleteAllMessages();
+      setIsOpen(false);
+    } catch (error) {
+      alert('Failed to delete messages: ' + error.message);
+    }
   };
 
   return (
@@ -50,9 +64,16 @@ function Navbar() {
                 <Link to="/chat" onClick={() => setIsOpen(false)}>Chat</Link>
               </li>
               {user?.is_admin && (
-                <li>
-                  <Link to="/specials" onClick={() => setIsOpen(false)}>Specials</Link>
-                </li>
+                <>
+                  <li>
+                    <Link to="/specials" onClick={() => setIsOpen(false)}>Specials</Link>
+                  </li>
+                  <li>
+                    <button onClick={handleClearChat} className="clear-chat-btn">
+                      Clear Chat
+                    </button>
+                  </li>
+                </>
               )}
               <li>
                 <button onClick={handleLogout} className="logout-btn">
