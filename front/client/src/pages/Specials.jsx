@@ -1,8 +1,11 @@
+// src/pages/Specials.jsx
 function Specials() {
   return (
-    <main>
-      <h1>Specials</h1>
-    </main>
+    <div className="page-container">
+      <div className="page-header">
+        <h1>Specials</h1>
+      </div>
+    </div>
   );
 }
 

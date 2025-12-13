@@ -9,7 +9,7 @@
   --text-color-1: #79c0ff;
   --accent-color: #58a6ff;
   --back-color: #0d1117;
-  --error-color: #6e7681;
+  --error-color: #58a6ff;
   --success-color: #58a6ff;
   --input-bg: #161b22;
   --input-border: #30363d;
@@ -55,10 +55,27 @@ body {
 main {
   flex: 1;
   padding: 5rem 2rem;
-  text-align: center;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* ============= Page Container ============= */
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--input-border);
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.8rem);
 }
 
 /* ============= Typography ============= */
@@ -302,24 +319,6 @@ li {
   border-radius: 4px;
   font-size: 1.3rem;
   font-weight: 700;
-}
-
-/* ============= Logout Button in Navbar ============= */
-.logout-btn {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.3rem;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0.5rem 0;
-  transition: color 0.2s ease;
-}
-
-.logout-btn:hover {
-  color: var(--text-color-1);
-  text-decoration: underline;
 }
 
 /* ============= Responsive Design ============= */

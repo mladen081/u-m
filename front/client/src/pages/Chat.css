@@ -106,6 +106,7 @@
   font-size: 1.4rem;
   display: block;
   margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .message-content {
@@ -114,6 +115,7 @@
   margin: 0.5rem 0;
   word-wrap: break-word;
   line-height: 1.5;
+  text-align: left;
 }
 
 .message-time {
@@ -122,6 +124,7 @@
   opacity: 1;
   display: block;
   margin-top: 0.5rem;
+  text-align: left;
 }
 
 .message-form {
