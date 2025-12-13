@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import TokenManager from '../utils/tokenManager';
 
-const useWebSocket = (onMessage, onClearAll) => {
+const useWebSocket = (onMessage, onClearAll, onUserListUpdate) => {
   const ws = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimeout = useRef(null);
@@ -38,6 +38,8 @@ const useWebSocket = (onMessage, onClearAll) => {
         onClearAll();
       } else if (data.action === 'new_message') {
         onMessage(data);
+      } else if (data.action === 'user_list_update') {
+        onUserListUpdate(data.users);
       }
     };
 
@@ -56,7 +58,7 @@ const useWebSocket = (onMessage, onClearAll) => {
     ws.current.onerror = () => {
       ws.current?.close();
     };
-  }, [onMessage, onClearAll]);
+  }, [onMessage, onClearAll, onUserListUpdate]);
 
   const disconnect = useCallback(() => {
     shouldReconnect.current = false;

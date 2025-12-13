@@ -7,6 +7,7 @@ from core.responses import success_response, error_response
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .models import Message
+from .consumers import ChatConsumer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -78,6 +79,37 @@ def delete_all_messages(request):
         logger.error(f"Error deleting messages | error={str(e)} | request_id={request_id}")
         return error_response(
             message="Failed to delete messages",
+            errors={"detail": str(e)},
+            request_id=request_id
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_online_users(request):
+    request_id = getattr(request, 'id', None)
+    
+    try:
+        unique_users = {}
+        for channel_data in ChatConsumer.connected_users.values():
+            user_id = channel_data['user_id']
+            if user_id not in unique_users:
+                unique_users[user_id] = channel_data['username']
+        
+        user_list = list(unique_users.values())
+        
+        logger.info(f"Online users retrieved | count={len(user_list)} | request_id={request_id}")
+        
+        return success_response(
+            message="Online users retrieved successfully",
+            data=user_list,
+            request_id=request_id
+        )
+        
+    except Exception as e:
+        logger.error(f"Error retrieving online users | error={str(e)} | request_id={request_id}")
+        return error_response(
+            message="Failed to retrieve online users",
             errors={"detail": str(e)},
             request_id=request_id
         )
