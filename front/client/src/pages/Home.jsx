@@ -20,7 +20,7 @@ function Home() {
         <h1>Homepage</h1>
       </div>
       <p>Hello</p>
-      <p>Online users: {onlineUsers.join(', ') || 'None'}</p>
+      <p>Online users: {onlineUsers.join(', ') || 'pending...'}</p>
     </div>
   );
 }

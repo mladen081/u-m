@@ -97,7 +97,7 @@
 
 .message-wrapper.own .message {
   background-color: var(--back-color);
-  border-left: 3px solid var(--accent-color);
+  /* border-left: 3px solid var(--accent-color); */
 }
 
 .message-username {
