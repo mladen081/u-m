@@ -13,8 +13,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initAuth = () => {
-      if (authService.isAuthenticated()) {
-        const currentUser = authService.getCurrentUser();
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
         setUser(currentUser);
       }
       setLoading(false);
@@ -58,8 +58,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
     navigate('/login');
   };

@@ -1,7 +1,6 @@
 // src/services/api.js
 
 import axios from 'axios';
-import TokenManager from '../utils/tokenManager';
 
 const api = axios.create({
   baseURL: '/api',
@@ -9,37 +8,23 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 10000,
+  withCredentials: true,
 });
 
 let isRefreshing = false;
 let failedQueue = [];
 
-const processQueue = (error, token = null) => {
+const processQueue = (error) => {
   failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve();
     }
   });
   
   failedQueue = [];
 };
-
-api.interceptors.request.use(
-  (config) => {
-    const token = TokenManager.getAccessToken();
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
 api.interceptors.response.use(
   (response) => {
@@ -56,8 +41,7 @@ api.interceptors.response.use(
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
-        .then(token => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+        .then(() => {
           return api(originalRequest);
         })
         .catch(err => {
@@ -68,45 +52,24 @@ api.interceptors.response.use(
     originalRequest._retry = true;
     isRefreshing = true;
 
-    const refreshToken = TokenManager.getRefreshToken();
-
-    if (!refreshToken) {
-      TokenManager.clearTokens();
-      isRefreshing = false;
-      
-      window.dispatchEvent(new Event('auth:logout'));
-      
-      return Promise.reject(error);
-    }
-
     try {
-      const response = await axios.post(
+      await axios.post(
         '/api/auth/token/refresh/',
-        { refresh: refreshToken },
-        { headers: { 'Content-Type': 'application/json' } }
+        {},
+        { 
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        }
       );
 
-      const { access, refresh: newRefresh } = response.data.data;
-
-      if (newRefresh) {
-        TokenManager.setTokens(access, newRefresh);
-      } else {
-        TokenManager.updateAccessToken(access);
-      }
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-      originalRequest.headers.Authorization = `Bearer ${access}`;
-
-      processQueue(null, access);
+      processQueue(null);
       isRefreshing = false;
 
       return api(originalRequest);
 
     } catch (refreshError) {
-      processQueue(refreshError, null);
+      processQueue(refreshError);
       isRefreshing = false;
-      
-      TokenManager.clearTokens();
       
       window.dispatchEvent(new Event('auth:logout'));
       

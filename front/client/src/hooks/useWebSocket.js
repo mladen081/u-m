@@ -1,7 +1,6 @@
 // src/hooks/useWebSocket.js
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import TokenManager from '../utils/tokenManager';
 
 const useWebSocket = (onMessage, onClearAll, onUserListUpdate) => {
   const ws = useRef(null);
@@ -12,9 +11,6 @@ const useWebSocket = (onMessage, onClearAll, onUserListUpdate) => {
 
   const connect = useCallback(() => {
     if (!shouldReconnect.current) return;
-    
-    const token = TokenManager.getAccessToken();
-    if (!token) return;
 
     if (ws.current?.readyState === WebSocket.OPEN || ws.current?.readyState === WebSocket.CONNECTING) {
       return;
@@ -22,7 +18,7 @@ const useWebSocket = (onMessage, onClearAll, onUserListUpdate) => {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = import.meta.env.DEV ? 'localhost:8000' : window.location.host;
-    const wsUrl = `${protocol}//${host}/ws/chat/?token=${encodeURIComponent(token)}`;
+    const wsUrl = `${protocol}//${host}/ws/chat/`;
 
     ws.current = new WebSocket(wsUrl);
 

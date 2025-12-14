@@ -93,11 +93,9 @@ class SecureLoginView(TokenObtainPairView):
                 f"Login successful | user_id={user.id} | username={username} | role={user.role} | ip={ip} | request_id={request_id}"
             )
             
-            return success_response(
+            response = success_response(
                 message="Login successful",
                 data={
-                    'access': access_token,
-                    'refresh': refresh_token,
                     'user': {
                         'id': user.id,
                         'username': user.username,
@@ -108,6 +106,28 @@ class SecureLoginView(TokenObtainPairView):
                 },
                 request_id=request_id
             )
+            
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite='Lax',
+                path='/',
+            )
+            
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh_token,
+                max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite='Lax',
+                path='/',
+            )
+            
+            return response
             
         except Exception as e:
             error_msg = str(e)
@@ -152,7 +172,7 @@ class SecureTokenRefreshView(TokenRefreshView):
         logger.info(f"Token refresh attempt | request_id={request_id}")
         
         try:
-            refresh_token = request.data.get('refresh')
+            refresh_token = request.COOKIES.get('refresh_token')
             
             if not refresh_token:
                 logger.warning(f"Token refresh failed - missing token | request_id={request_id}")
@@ -162,21 +182,45 @@ class SecureTokenRefreshView(TokenRefreshView):
                     request_id=request_id
                 )
             
+            request.data._mutable = True
+            request.data['refresh'] = refresh_token
+            request.data._mutable = False
+            
             response = super().post(request, *args, **kwargs)
             
-            result = {'access': response.data['access']}
+            access_token = response.data['access']
+            new_refresh_token = response.data.get('refresh')
             
-            if 'refresh' in response.data:
-                result['refresh'] = response.data['refresh']
-                logger.info(f"Token refreshed with rotation | request_id={request_id}")
-            else:
-                logger.info(f"Token refreshed | request_id={request_id}")
+            logger.info(f"Token refreshed | request_id={request_id}")
             
-            return success_response(
+            response = success_response(
                 message="Token refreshed successfully",
-                data=result,
+                data={},
                 request_id=request_id
             )
+            
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite='Lax',
+                path='/',
+            )
+            
+            if new_refresh_token:
+                response.set_cookie(
+                    key='refresh_token',
+                    value=new_refresh_token,
+                    max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+                    httponly=True,
+                    secure=not settings.DEBUG,
+                    samesite='Lax',
+                    path='/',
+                )
+            
+            return response
             
         except Exception as e:
             error_msg = str(e)
@@ -286,11 +330,9 @@ class RegisterView(APIView):
                 refresh_token = str(token)
                 access_token = str(token.access_token)
                 
-                return success_response(
+                response = success_response(
                     message="Registration successful",
                     data={
-                        'access': access_token,
-                        'refresh': refresh_token,
                         'user': {
                             'id': user.id,
                             'username': user.username,
@@ -302,6 +344,28 @@ class RegisterView(APIView):
                     status=status.HTTP_201_CREATED,
                     request_id=request_id
                 )
+                
+                response.set_cookie(
+                    key='access_token',
+                    value=access_token,
+                    max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+                    httponly=True,
+                    secure=not settings.DEBUG,
+                    samesite='Lax',
+                    path='/',
+                )
+                
+                response.set_cookie(
+                    key='refresh_token',
+                    value=refresh_token,
+                    max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
+                    httponly=True,
+                    secure=not settings.DEBUG,
+                    samesite='Lax',
+                    path='/',
+                )
+                
+                return response
         
         except Exception as e:
             error_msg = str(e)
@@ -333,6 +397,23 @@ class RegisterView(APIView):
         else:
             ip = request.META.get('REMOTE_ADDR', 'unknown')
         return ip
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout_view(request):
+    request_id = getattr(request, 'id', None)
+    logger.info(f"Logout request | request_id={request_id}")
+    
+    response = success_response(
+        message="Logged out successfully",
+        request_id=request_id
+    )
+    
+    response.delete_cookie('access_token', path='/')
+    response.delete_cookie('refresh_token', path='/')
+    
+    return response
 
 
 class PasswordResetRequestThrottle(AnonRateThrottle):
