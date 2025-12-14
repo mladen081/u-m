@@ -1,4 +1,5 @@
 # config/settings.py
+
 from pathlib import Path
 import os
 from datetime import timedelta
@@ -33,7 +34,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'core.middleware.RequestIDMiddleware',
-    'core.middleware.DecryptTokenMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

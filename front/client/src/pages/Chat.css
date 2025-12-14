@@ -92,12 +92,10 @@
   border-radius: 8px;
   max-width: 70%;
   background-color: var(--back-color);
-  /* border: 1px solid var(--input-border); */
 }
 
 .message-wrapper.own .message {
   background-color: var(--back-color);
-  /* border-left: 3px solid var(--accent-color); */
 }
 
 .message-username {

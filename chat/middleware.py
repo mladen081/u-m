@@ -1,10 +1,11 @@
 # chat/middleware.py
+
 from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth import get_user_model
-from core.encryption import TokenEncryption
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,16 +14,27 @@ User = get_user_model()
 @database_sync_to_async
 def get_user_from_token(token_string):
     try:
-        try:
-            decrypted_token = TokenEncryption.decrypt(token_string)
-            token = AccessToken(decrypted_token)
-        except:
-            token = AccessToken(token_string)
+        token = AccessToken(token_string)
+        user_id = token.get('user_id')
         
-        user_id = token['user_id']
-        return User.objects.get(id=user_id)
+        if not user_id:
+            raise InvalidToken('No user_id in token')
+        
+        user = User.objects.get(id=user_id)
+        
+        if not user.is_active:
+            raise InvalidToken('User is inactive')
+            
+        return user
+        
+    except (InvalidToken, TokenError) as e:
+        logger.warning(f"Invalid token: {str(e)}")
+        return AnonymousUser()
+    except User.DoesNotExist:
+        logger.warning(f"User not found for token")
+        return AnonymousUser()
     except Exception as e:
-        logger.warning(f"WebSocket auth failed: {str(e)}")
+        logger.error(f"Unexpected error in WebSocket auth: {str(e)}")
         return AnonymousUser()
 
 class JWTAuthMiddleware(BaseMiddleware):

@@ -1,4 +1,5 @@
 # accounts/views.py
+
 import logging
 
 from django.conf import settings
@@ -17,7 +18,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from core.encryption import TokenEncryption
 from core.responses import (
     conflict_response,
     error_response,
@@ -85,9 +85,6 @@ class SecureLoginView(TokenObtainPairView):
             access_token = response.data['access']
             refresh_token = response.data['refresh']
             
-            encrypted_access = TokenEncryption.encrypt(access_token)
-            encrypted_refresh = TokenEncryption.encrypt(refresh_token)
-            
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user = serializer.user
@@ -99,8 +96,8 @@ class SecureLoginView(TokenObtainPairView):
             return success_response(
                 message="Login successful",
                 data={
-                    'access': encrypted_access,
-                    'refresh': encrypted_refresh,
+                    'access': access_token,
+                    'refresh': refresh_token,
                     'user': {
                         'id': user.id,
                         'username': user.username,
@@ -155,9 +152,9 @@ class SecureTokenRefreshView(TokenRefreshView):
         logger.info(f"Token refresh attempt | request_id={request_id}")
         
         try:
-            encrypted_refresh = request.data.get('refresh')
+            refresh_token = request.data.get('refresh')
             
-            if not encrypted_refresh:
+            if not refresh_token:
                 logger.warning(f"Token refresh failed - missing token | request_id={request_id}")
                 return validation_error_response(
                     message="Refresh token is required",
@@ -165,35 +162,12 @@ class SecureTokenRefreshView(TokenRefreshView):
                     request_id=request_id
                 )
             
-            try:
-                decrypted_refresh = TokenEncryption.decrypt(encrypted_refresh)
-            except ValueError as e:
-                logger.warning(
-                    f"Token refresh failed - decryption error | error={str(e)} | request_id={request_id}"
-                )
-                return error_response(
-                    message="Invalid refresh token format",
-                    errors={"refresh": ["Token decryption failed"]},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                    code="INVALID_REFRESH_TOKEN",
-                    request_id=request_id
-                )
+            response = super().post(request, *args, **kwargs)
             
-            from rest_framework.request import Request
-            from io import BytesIO
-            
-            new_request = Request(request._request)
-            new_request._full_data = {'refresh': decrypted_refresh}
-            
-            response = TokenRefreshView.post(self, new_request, *args, **kwargs)
-            
-            new_access = TokenEncryption.encrypt(response.data['access'])
-            
-            result = {'access': new_access}
+            result = {'access': response.data['access']}
             
             if 'refresh' in response.data:
-                new_refresh = TokenEncryption.encrypt(response.data['refresh'])
-                result['refresh'] = new_refresh
+                result['refresh'] = response.data['refresh']
                 logger.info(f"Token refreshed with rotation | request_id={request_id}")
             else:
                 logger.info(f"Token refreshed | request_id={request_id}")
@@ -204,17 +178,6 @@ class SecureTokenRefreshView(TokenRefreshView):
                 request_id=request_id
             )
             
-        except ValueError as e:
-            logger.warning(
-                f"Token refresh failed - decryption error | error={str(e)} | request_id={request_id}"
-            )
-            return error_response(
-                message="Invalid refresh token",
-                status=status.HTTP_401_UNAUTHORIZED,
-                code="INVALID_REFRESH_TOKEN",
-                request_id=request_id
-            )
-        
         except Exception as e:
             error_msg = str(e)
             logger.warning(
@@ -323,14 +286,11 @@ class RegisterView(APIView):
                 refresh_token = str(token)
                 access_token = str(token.access_token)
                 
-                encrypted_access = TokenEncryption.encrypt(access_token)
-                encrypted_refresh = TokenEncryption.encrypt(refresh_token)
-                
                 return success_response(
                     message="Registration successful",
                     data={
-                        'access': encrypted_access,
-                        'refresh': encrypted_refresh,
+                        'access': access_token,
+                        'refresh': refresh_token,
                         'user': {
                             'id': user.id,
                             'username': user.username,
