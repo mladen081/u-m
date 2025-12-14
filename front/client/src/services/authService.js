@@ -1,7 +1,6 @@
 // src/services/authService.js
 
 import api from './api';
-import TokenManager from '../utils/tokenManager';
 
 const authService = {
   async login(username, password) {
@@ -11,9 +10,8 @@ const authService = {
         password,
       });
 
-      const { access, refresh, user } = response.data.data;
-
-      TokenManager.setTokens(access, refresh, user);
+      const { user } = response.data.data;
+      localStorage.setItem('user', JSON.stringify(user));
 
       return user;
     } catch (error) {
@@ -30,9 +28,8 @@ const authService = {
         password,
       });
 
-      const { access, refresh, user } = response.data.data;
-
-      TokenManager.setTokens(access, refresh, user);
+      const { user } = response.data.data;
+      localStorage.setItem('user', JSON.stringify(user));
 
       return user;
     } catch (error) {
@@ -50,20 +47,27 @@ const authService = {
     }
   },
 
-  logout() {
-    TokenManager.clearTokens();
-  },
-
-  isAuthenticated() {
-    return TokenManager.isAuthenticated();
+  async logout() {
+    try {
+      await api.post('/auth/logout/');
+      localStorage.removeItem('user');
+    } catch (error) {
+      localStorage.removeItem('user');
+    }
   },
 
   getCurrentUser() {
-    return TokenManager.getUser();
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  },
+
+  isAuthenticated() {
+    return !!this.getCurrentUser();
   },
 
   isAdmin() {
-    return TokenManager.isAdmin();
+    const user = this.getCurrentUser();
+    return user?.is_admin === true;
   },
 };
 
