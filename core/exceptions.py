@@ -80,8 +80,9 @@ def custom_exception_handler(exc, context):
             )
         
         if isinstance(exc, MethodNotAllowed):
+            method = context.get('request').method if context and 'request' in context else 'UNKNOWN'
             return error_response(
-                message=f"Method '{exc.method}' not allowed",
+                message=f"Method '{method}' not allowed",
                 errors=response.data if isinstance(response.data, dict) else None,
                 status=response.status_code,
                 code="METHOD_NOT_ALLOWED",
