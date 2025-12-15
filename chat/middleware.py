@@ -50,7 +50,7 @@ class JWTAuthMiddleware(BaseMiddleware):
                     key, value = cookie.split('=', 1)
                     cookies[key] = value
         
-        token = cookies.get('access_token')
+        token = cookies.get('__Host-access_token')
         
         if token:
             scope['user'] = await get_user_from_token(token)

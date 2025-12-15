@@ -108,22 +108,22 @@ class SecureLoginView(TokenObtainPairView):
             )
             
             response.set_cookie(
-                key='access_token',
+                key='__Host-access_token',
                 value=access_token,
                 max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
                 httponly=True,
-                secure=not settings.DEBUG,
-                samesite='Lax',
+                secure=True,
+                samesite='Strict',
                 path='/',
             )
             
             response.set_cookie(
-                key='refresh_token',
+                key='__Host-refresh_token',
                 value=refresh_token,
                 max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                 httponly=True,
-                secure=not settings.DEBUG,
-                samesite='Lax',
+                secure=True,
+                samesite='Strict',
                 path='/',
             )
             
@@ -172,7 +172,7 @@ class SecureTokenRefreshView(TokenRefreshView):
         logger.info(f"Token refresh attempt | request_id={request_id}")
         
         try:
-            refresh_token = request.COOKIES.get('refresh_token')
+            refresh_token = request.COOKIES.get('__Host-refresh_token')
             
             if not refresh_token:
                 logger.warning(f"Token refresh failed - missing token | request_id={request_id}")
@@ -200,23 +200,23 @@ class SecureTokenRefreshView(TokenRefreshView):
             )
             
             response.set_cookie(
-                key='access_token',
+                key='__Host-access_token',
                 value=access_token,
                 max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
                 httponly=True,
-                secure=not settings.DEBUG,
-                samesite='Lax',
+                secure=True,
+                samesite='Strict',
                 path='/',
             )
             
             if new_refresh_token:
                 response.set_cookie(
-                    key='refresh_token',
+                    key='__Host-refresh_token',
                     value=new_refresh_token,
                     max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                     httponly=True,
-                    secure=not settings.DEBUG,
-                    samesite='Lax',
+                    secure=True,
+                    samesite='Strict',
                     path='/',
                 )
             
@@ -346,22 +346,22 @@ class RegisterView(APIView):
                 )
                 
                 response.set_cookie(
-                    key='access_token',
+                    key='__Host-access_token',
                     value=access_token,
                     max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
                     httponly=True,
-                    secure=not settings.DEBUG,
-                    samesite='Lax',
+                    secure=True,
+                    samesite='Strict',
                     path='/',
                 )
                 
                 response.set_cookie(
-                    key='refresh_token',
+                    key='__Host-refresh_token',
                     value=refresh_token,
                     max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
                     httponly=True,
-                    secure=not settings.DEBUG,
-                    samesite='Lax',
+                    secure=True,
+                    samesite='Strict',
                     path='/',
                 )
                 
@@ -405,13 +405,23 @@ def logout_view(request):
     request_id = getattr(request, 'id', None)
     logger.info(f"Logout request | request_id={request_id}")
     
+    try:
+        from rest_framework_simplejwt.tokens import RefreshToken
+        refresh_token = request.COOKIES.get('__Host-refresh_token')
+        if refresh_token:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            logger.info(f"Token blacklisted | request_id={request_id}")
+    except Exception as e:
+        logger.warning(f"Token blacklist failed | error={str(e)} | request_id={request_id}")
+    
     response = success_response(
         message="Logged out successfully",
         request_id=request_id
     )
     
-    response.delete_cookie('access_token', path='/')
-    response.delete_cookie('refresh_token', path='/')
+    response.delete_cookie('__Host-access_token', path='/')
+    response.delete_cookie('__Host-refresh_token', path='/')
     
     return response
 
