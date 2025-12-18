@@ -110,18 +110,29 @@ function Chat() {
         {Object.entries(groupedMessages).map(([date, msgs]) => (
           <div key={date}>
             <div className="date-separator">{date}</div>
-            {msgs.map((msg) => (
-              <div
-                key={msg.message_id || msg.id}
-                className={`message-wrapper ${msg.user_id === user?.id ? 'own' : 'other'}`}
-              >
-                <div className="message">
-                  <span className="message-username">{msg.username}</span>
-                  <p className="message-content">{msg.message}</p>
-                  <span className="message-time">{formatTime(msg.timestamp)}</span>
+            {msgs.map((msg) => {
+              const isOwn = msg.user_id === user?.id;
+              
+              return (
+                <div
+                  key={msg.message_id || msg.id}
+                  className={`message-wrapper ${isOwn ? 'own' : 'other'}`}
+                >
+                  <div className="message">
+                    <p className="message-content">{msg.message}</p>
+                    {isOwn && (
+                      <span className="message-time">{formatTime(msg.timestamp)}</span>
+                    )}
+                    {!isOwn && (
+                      <div className="message-header">
+                        <span className="message-username">{msg.username}</span>
+                        <span className="message-time">{formatTime(msg.timestamp)}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
         <div ref={messagesEndRef} />

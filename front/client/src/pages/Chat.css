@@ -14,7 +14,7 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--input-border);
+  /* border-bottom: 1px solid var(--input-border); */
   margin-bottom: 2rem;
 }
 
@@ -29,11 +29,11 @@
 }
 
 .status.connected {
-  color: var(--success-color);
+  color: var(--text-color-light);
 }
 
 .status.disconnected {
-  color: var(--error-color);
+  color: var(--text-color);
 }
 
 .messages-container {
@@ -44,7 +44,9 @@
   scrollbar-width: none;
 }
 
-::-webkit-scrollbar { display: none; }
+.messages-container::-webkit-scrollbar {
+  display: none;
+}
 
 .date-separator {
   text-align: center;
@@ -80,49 +82,59 @@
 }
 
 .message-wrapper.own {
-  justify-content: flex-start;
+  justify-content: flex-end;
 }
 
 .message-wrapper.other {
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .message {
   padding: 1.2rem;
   border-radius: 8px;
   max-width: 70%;
-  background-color: var(--back-color);
 }
 
-.message-wrapper.own .message {
-  background-color: var(--back-color);
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
 }
 
 .message-username {
   font-weight: 700;
-  color: var(--text-color-1);
   font-size: 1.4rem;
-  display: block;
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-.message-content {
-  color: var(--primary-color);
-  font-size: 1.3rem;
-  margin: 0.5rem 0;
-  word-wrap: break-word;
-  line-height: 1.5;
-  text-align: left;
+  background-color: #57606a14;
+  border-radius: 6px;
+  color: var(--text-color-light);
+  opacity: 0.9;
+  padding: .4rem .6rem;
 }
 
 .message-time {
   font-size: 1.2rem;
   color: var(--text-color);
-  opacity: 1;
+  opacity: 0.9;
+}
+
+.message-content {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  margin: 0;
+  word-wrap: break-word;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.message-wrapper.own .message-content {
+  text-align: right;
+}
+
+.message-wrapper.own .message-time {
+  text-align: right;
   display: block;
   margin-top: 0.5rem;
-  text-align: left;
 }
 
 .message-form {
@@ -171,14 +183,15 @@
   font-family: 'JetBrains Mono', monospace;
   background-color: var(--button-bg);
   color: var(--primary-color);
-  border: none;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .message-form button:hover:not(:disabled) {
   background-color: var(--button-hover);
+  border-color: var(--accent-color);
 }
 
 .message-form button:disabled {
