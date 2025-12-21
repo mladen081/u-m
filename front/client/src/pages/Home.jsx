@@ -17,7 +17,7 @@ function Home() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Homepage</h1>
+        <h1>Home</h1>
       </div>
       <p>Hello</p>
       <p>Online users: {onlineUsers.join(', ') || 'pending...'}</p>

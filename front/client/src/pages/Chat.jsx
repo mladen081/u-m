@@ -100,7 +100,7 @@ function Chat() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <h1>Global Chat</h1>
+        <h1>Chat</h1>
         <span className={`status ${isConnected ? 'connected' : 'disconnected'}`}>
           {isConnected ? '● Connected' : '○ Disconnected'}
         </span>

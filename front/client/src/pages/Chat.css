@@ -14,13 +14,13 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1.5rem;
-  /* border-bottom: 1px solid var(--input-border); */
   margin-bottom: 2rem;
 }
 
 .chat-header h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--text-primary);
 }
 
 .status {
@@ -29,11 +29,12 @@
 }
 
 .status.connected {
-  color: var(--text-color-light);
+  color: var(--accent-green);
 }
 
 .status.disconnected {
-  color: var(--text-color);
+  color: var(--text-primary);
+  opacity: 0.5;
 }
 
 .messages-container {
@@ -44,17 +45,14 @@
   scrollbar-width: none;
 }
 
-.messages-container::-webkit-scrollbar {
-  display: none;
-}
-
 .date-separator {
   text-align: center;
   margin: 2rem 0 1rem 0;
-  color: var(--text-color);
+  color: var(--text-primary);
   font-size: 1.2rem;
   font-weight: 700;
   position: relative;
+  opacity: 0.6;
 }
 
 .date-separator::before,
@@ -64,7 +62,7 @@
   top: 50%;
   width: 35%;
   height: 1px;
-  background-color: var(--input-border);
+  background-color: var(--border-color);
 }
 
 .date-separator::before {
@@ -105,21 +103,21 @@
 .message-username {
   font-weight: 700;
   font-size: 1.4rem;
-  background-color: #57606a14;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: var(--text-color-light);
-  opacity: 0.9;
+  color: var(--accent-green);
   padding: .4rem .6rem;
 }
 
 .message-time {
   font-size: 1.2rem;
-  color: var(--text-color);
-  opacity: 0.9;
+  color: var(--text-primary);
+  opacity: 0.6;
 }
 
 .message-content {
-  color: var(--primary-color);
+  color: var(--text-primary);
   font-size: 1.3rem;
   margin: 0;
   word-wrap: break-word;
@@ -159,16 +157,22 @@
   padding: 1.2rem;
   font-size: 1.4rem;
   font-family: 'JetBrains Mono', monospace;
-  background-color: var(--input-bg);
-  border: 1px solid var(--input-border);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: var(--primary-color);
+  color: var(--text-primary);
   transition: border-color 0.2s ease;
 }
 
 .message-form input:focus {
   outline: none;
-  border-color: var(--input-focus);
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 2px rgba(63, 185, 80, 0.1);
+}
+
+.message-form input::placeholder {
+  color: var(--text-primary);
+  opacity: 0.4;
 }
 
 .message-form input:disabled {
@@ -181,9 +185,9 @@
   font-size: 1.5rem;
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
-  background-color: var(--button-bg);
-  color: var(--primary-color);
-  border: 1px solid var(--input-border);
+  background-color: var(--accent-green);
+  color: var(--bg-primary);
+  border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -191,7 +195,8 @@
 
 .message-form button:hover:not(:disabled) {
   background-color: var(--button-hover);
-  border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(63, 185, 80, 0.2);
 }
 
 .message-form button:disabled {

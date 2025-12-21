@@ -2,20 +2,20 @@
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700;800&display=swap');
 
-/* ============= CSS Variables ============= */
+/* ============= CSS Variables - Dark Theme ============= */
 :root {
-  --primary-color: #24292f;
-  --text-color: #57606a;
-  --text-color-light: #24292f;
-  --accent-color: #6e7781;
-  --back-color: #ffffff;
-  --error-color: #57606a;
-  --success-color: #24292f;
-  --input-bg: #f6f8fa;
-  --input-border: #d0d7de;
-  --input-focus: #6e7781;
-  --button-bg: #f6f8fa;
-  --button-hover: #eaeef2;
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --text-primary: #c9d1d9;
+  --accent-green: #3fb950;
+  
+  /* Derived colors */
+  --border-color: #30363d;
+  --button-hover: #2ea043;
+  --error-bg: #f851442e;
+  --error-border: #f85149;
+  --success-bg: #3fb9502e;
+  --success-border: #3fb950;
 }
 
 /* ============= Base Styles ============= */
@@ -33,8 +33,8 @@ html {
 
 body {
   font-family: 'JetBrains Mono', monospace;
-  color: var(--primary-color);
-  background-color: var(--back-color);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
   line-height: 1.6;
   font-size: clamp(1.3rem, 2.3vw, 1.5rem);
 }
@@ -54,7 +54,7 @@ body {
 
 main {
   flex: 1;
-  padding: 5rem 2rem;
+  padding: 6rem 2rem 2rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -69,7 +69,7 @@ main {
 
 .page-header {
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--input-border);
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 2rem;
 }
 
@@ -82,7 +82,7 @@ main {
 h1 {
   font-size: clamp(2rem, 4.3vw, 4.3rem);
   font-weight: 900;
-  color: var(--text-color-light);
+  color: var(--text-primary);
   margin: 2rem 0 1rem 0;
   line-height: 1.2;
 }
@@ -90,7 +90,7 @@ h1 {
 h2 {
   font-size: clamp(1.8rem, 3.8vw, 3.3rem);
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--text-primary);
   margin: 1.5rem 0 1rem 0;
   line-height: 1.3;
 }
@@ -98,31 +98,33 @@ h2 {
 h3 {
   font-size: clamp(1.6rem, 3.3vw, 2.8rem);
   font-weight: 700;
-  color: var(--text-color-light);
+  color: var(--text-primary);
   margin: 1.2rem 0 0.8rem 0;
   line-height: 1.3;
 }
 
 p {
   font-size: clamp(1.3rem, 2.3vw, 1.8rem);
-  color: var(--text-color);
+  color: var(--text-primary);
   margin: 1rem 0;
   line-height: 1.6;
 }
 
 a {
-  color: var(--text-color-light);
+  color: var(--accent-green);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
+  color: var(--button-hover);
   text-decoration: underline;
 }
 
 ul, ol {
   margin: 1rem 0;
   padding-left: 2rem;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 li {
@@ -131,17 +133,18 @@ li {
 
 /* ============= Footer ============= */
 .footer {
-  background-color: var(--back-color);
+  background-color: var(--bg-primary);
   padding: 2rem;
   text-align: center;
-  border-top: 1px solid var(--input-border);
+  border-top: 1px solid var(--border-color);
   margin-top: auto;
 }
 
 .footer p {
   margin: 0;
   font-size: clamp(1.3rem, 2.3vw, 1.5rem);
-  color: var(--text-color);
+  color: var(--text-primary);
+  opacity: 0.7;
 }
 
 /* ============= Screen Reader Only ============= */
@@ -167,19 +170,20 @@ li {
 }
 
 .auth-box {
-  background-color: var(--input-bg);
-  border: 1px solid var(--input-border);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 3rem;
   max-width: 450px;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .auth-box h1 {
   margin-top: 0;
   margin-bottom: 2rem;
   text-align: center;
+  font-size: clamp(2rem, 4vw, 2.8rem);
 }
 
 /* ============= Forms ============= */
@@ -198,28 +202,29 @@ li {
 .form-group label {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--text-primary);
 }
 
 .form-group input {
   padding: 1.2rem;
   font-size: 1.3rem;
   font-family: 'JetBrains Mono', monospace;
-  background-color: var(--back-color);
-  border: 1px solid var(--input-border);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: var(--primary-color);
+  color: var(--text-primary);
   transition: border-color 0.2s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--input-focus);
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 2px rgba(63, 185, 80, 0.1);
 }
 
 .form-group input::placeholder {
-  color: var(--text-color);
-  opacity: 0.6;
+  color: var(--text-primary);
+  opacity: 0.4;
 }
 
 /* ============= Buttons ============= */
@@ -228,9 +233,9 @@ li {
   font-size: 1.5rem;
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
-  background-color: var(--button-bg);
-  color: var(--primary-color);
-  border: 1px solid var(--input-border);
+  background-color: var(--accent-green);
+  color: var(--bg-primary);
+  border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -238,21 +243,22 @@ li {
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--button-hover);
-  border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(63, 185, 80, 0.2);
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* ============= Error/Success Messages ============= */
 .error-message {
   padding: 1.2rem;
-  background-color: rgba(87, 96, 106, 0.1);
-  border: 1px solid var(--text-color);
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
   border-radius: 6px;
-  color: var(--text-color);
+  color: var(--text-primary);
   font-size: 1.3rem;
   margin-bottom: 1.5rem;
   white-space: pre-line;
@@ -260,10 +266,10 @@ li {
 
 .success-message {
   padding: 1.2rem;
-  background-color: rgba(36, 41, 47, 0.08);
-  border: 1px solid var(--text-color-light);
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
   border-radius: 6px;
-  color: var(--text-color-light);
+  color: var(--text-primary);
   font-size: 1.3rem;
   margin-bottom: 1.5rem;
 }
@@ -273,15 +279,17 @@ li {
   text-align: center;
   margin-top: 2rem;
   font-size: 1.3rem;
-  color: var(--text-color);
+  color: var(--text-primary);
+  opacity: 0.8;
 }
 
 .auth-link a {
-  color: var(--text-color-light);
+  color: var(--accent-green);
   font-weight: 700;
 }
 
 .auth-link a:hover {
+  color: var(--button-hover);
   text-decoration: underline;
 }
 
@@ -295,7 +303,7 @@ li {
 
 .loading-container p {
   font-size: 1.8rem;
-  color: var(--text-color-light);
+  color: var(--text-primary);
 }
 
 /* ============= User Info in Navbar ============= */
@@ -304,20 +312,20 @@ li {
   align-items: center;
   gap: 1rem;
   padding: 0.8rem 1.2rem;
-  background-color: rgba(87, 96, 106, 0.08);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
 }
 
 .username {
   font-weight: 700;
-  color: var(--text-color-light);
+  color: var(--text-primary);
 }
 
 .badge-admin {
   padding: 0.3rem 0.8rem;
-  background-color: var(--button-bg);
-  color: var(--primary-color);
-  border: 1px solid var(--input-border);
+  background-color: var(--accent-green);
+  color: var(--bg-primary);
   border-radius: 4px;
   font-size: 1.3rem;
   font-weight: 700;
@@ -325,6 +333,10 @@ li {
 
 /* ============= Responsive Design ============= */
 @media (max-width: 768px) {
+  main {
+    padding: 6rem 2rem 0 2rem;
+  }
+
   .auth-box {
     padding: 2rem;
   }
